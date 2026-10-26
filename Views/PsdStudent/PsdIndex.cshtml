@@ -16,6 +16,8 @@
             <th>Hệ ĐT</th>
             <th>Địa chỉ</th>
             <th>Email</th>
+            <th>Điểm</th>
+            <th>Chức năng</th>
         </tr>
     </thead>
     <tbody>
@@ -48,6 +50,11 @@
                 <td>@(s.IsRegular ? "Chính quy" : "Phi chính quy")</td>
                 <td>@s.Address</td>
                 <td>@s.Email</td>
+                <td>@s.Score</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@s.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@s.Id">Delete</a>
+                </td>
             </tr>
         }
     </tbody>

@@ -10,16 +10,16 @@ namespace Psd_day10.Controllers
         {
             new PsdStudent() { Id = 101, Name = "Hải Nam", Branch = PsdBranch.IT,
                 Gender = PsdGender.Male, IsRegular = true,
-                Address = "A1-2018", Email = "nam@g.com" },
+                Address = "A1-2018", Email = "nam@gmail.com", DateOfBorth = DateTime.Parse("2000-01-01"), Score = 8.5 },
             new PsdStudent() { Id = 102, Name = "Minh Tú", Branch = PsdBranch.BE,
                 Gender = PsdGender.Female, IsRegular = true,
-                Address = "A1-2019", Email = "tu@g.com" },
+                Address = "A1-2019", Email = "tu@gmail.com", DateOfBorth = DateTime.Parse("2001-02-15"), Score = 7.0 },
             new PsdStudent() { Id = 103, Name = "Hoàng Phong", Branch = PsdBranch.CE,
                 Gender = PsdGender.Male, IsRegular = false,
-                Address = "A1-2020", Email = "phong@g.com" },
+                Address = "A1-2020", Email = "phong@gmail.com", DateOfBorth = DateTime.Parse("1999-11-20"), Score = 6.5 },
             new PsdStudent() { Id = 104, Name = "Xuân Mai", Branch = PsdBranch.EE,
                 Gender = PsdGender.Female, IsRegular = false,
-                Address = "A1-2021", Email = "mai@g.com" }
+                Address = "A1-2021", Email = "mai@gmail.com", DateOfBorth = DateTime.Parse("2002-08-10"), Score = 9.0 }
         };
 
         [Route("Admin/Student/List")]
@@ -68,9 +68,110 @@ namespace Psd_day10.Controllers
         [Route("PsdStudent/Create")]
         public IActionResult Create(PsdStudent s)
         {
-            s.Id = listStudents.Last().Id + 1;
-            listStudents.Add(s);
-            return View("PsdIndex", listStudents);
+            if (ModelState.IsValid)
+            {
+                s.Id = listStudents.Last().Id + 1;
+                listStudents.Add(s);
+                return View("PsdIndex", listStudents);
+            }
+            ViewBag.AllGenders = Enum.GetValues(typeof(PsdGender)).Cast<PsdGender>().ToList();
+            ViewBag.AllBranches = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = "IT", Value = "1" },
+                new SelectListItem { Text = "BE", Value = "2" },
+                new SelectListItem { Text = "CE", Value = "3" },
+                new SelectListItem { Text = "EE", Value = "4" }
+            };
+            return View("PsdCreate", s);
+        }
+
+        [HttpGet]
+        [Route("Admin/Student/Edit/{id?}")]
+        [Route("Admin/PsdStudent/Edit/{id?}")]
+        [Route("Student/Edit/{id?}")]
+        [Route("PsdStudent/Edit/{id?}")]
+        public IActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var student = listStudents.FirstOrDefault(s => s.Id == id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            ViewBag.AllGenders = Enum.GetValues(typeof(PsdGender)).Cast<PsdGender>().ToList();
+            ViewBag.AllBranches = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = "IT", Value = "1" },
+                new SelectListItem { Text = "BE", Value = "2" },
+                new SelectListItem { Text = "CE", Value = "3" },
+                new SelectListItem { Text = "EE", Value = "4" }
+            };
+            return View("PsdEdit", student);
+        }
+
+        [HttpPost]
+        [Route("Admin/Student/Edit/{id?}")]
+        [Route("Admin/PsdStudent/Edit/{id?}")]
+        [Route("Student/Edit/{id?}")]
+        [Route("PsdStudent/Edit/{id?}")]
+        public IActionResult Edit(int id, PsdStudent s)
+        {
+            if (ModelState.IsValid)
+            {
+                var index = listStudents.FindIndex(x => x.Id == id);
+                if (index != -1)
+                {
+                    s.Id = id;
+                    listStudents[index] = s;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.AllGenders = Enum.GetValues(typeof(PsdGender)).Cast<PsdGender>().ToList();
+            ViewBag.AllBranches = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = "IT", Value = "1" },
+                new SelectListItem { Text = "BE", Value = "2" },
+                new SelectListItem { Text = "CE", Value = "3" },
+                new SelectListItem { Text = "EE", Value = "4" }
+            };
+            return View("PsdEdit", s);
+        }
+
+        [HttpGet]
+        [Route("Admin/Student/Delete/{id?}")]
+        [Route("Admin/PsdStudent/Delete/{id?}")]
+        [Route("Student/Delete/{id?}")]
+        [Route("PsdStudent/Delete/{id?}")]
+        public IActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var student = listStudents.FirstOrDefault(s => s.Id == id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            return View("PsdDelete", student);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [Route("Admin/Student/Delete/{id?}")]
+        [Route("Admin/PsdStudent/Delete/{id?}")]
+        [Route("Student/Delete/{id?}")]
+        [Route("PsdStudent/Delete/{id?}")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var student = listStudents.FirstOrDefault(s => s.Id == id);
+            if (student != null)
+            {
+                listStudents.Remove(student);
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

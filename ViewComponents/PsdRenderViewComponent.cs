@@ -12,7 +12,7 @@ namespace Psd_day10.ViewComponents
             MenuItems = new List<PsdMenuItem>()
             {
                 new PsdMenuItem() { Id = 1, Name = "Branches", Link = "/Admin/Student/Branches/List" },
-                new PsdMenuItem() { Id = 2, Name = "Students", Link = "/Admin/Student/List" },
+                new PsdMenuItem() { Id = 2, Name = "Students", Link = "/Learner" },
                 new PsdMenuItem() { Id = 3, Name = "Subjects", Link = "/Admin/Student/Subjects/List" },
                 new PsdMenuItem() { Id = 4, Name = "Courses", Link = "/Admin/Student/Courses/List" }
             };

@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Psd_day10.Data;
+using Psd_day10.Models;
+
 namespace Psd_day10
 {
     public class Program
@@ -6,9 +10,24 @@ namespace Psd_day10
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<PsdSchoolContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
+
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    PsdDbInitializer.Initialize(services);
+                }
+                catch
+                {
+                }
+            }
 
             if (!app.Environment.IsDevelopment())
             {
