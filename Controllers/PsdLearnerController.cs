@@ -9,6 +9,7 @@ namespace Psd_day10.Controllers
     public class PsdLearnerController : Controller
     {
         private PsdSchoolContext db;
+        private int pageSize = 3;
 
         public PsdLearnerController(PsdSchoolContext context)
         {
@@ -19,10 +20,50 @@ namespace Psd_day10.Controllers
         [Route("Learner")]
         [Route("PsdLearner/Index")]
         [Route("PsdLearner")]
-        public IActionResult Index()
+        public IActionResult Index(int? mid)
         {
-            var learners = db.Learners.Include(m => m.Major).ToList();
-            return View("PsdIndex", learners);
+            var learners = (IQueryable<PsdLearner>)db.Learners.Include(m => m.Major);
+            if (mid != null)
+            {
+                learners = (IQueryable<PsdLearner>)db.Learners.Where(l => l.MajorID == mid).Include(m => m.Major);
+                ViewBag.mid = mid;
+            }
+            int pageNum = (int)Math.Ceiling(learners.Count() / (float)pageSize);
+            ViewBag.pageNum = pageNum;
+            var result = learners.Take(pageSize).ToList();
+            return View("PsdIndex", result);
+        }
+
+        [Route("Learner/LearnerByMajorID")]
+        [Route("PsdLearner/LearnerByMajorID")]
+        [Route("LearnerByMajorID")]
+        public IActionResult LearnerByMajorID(int mid)
+        {
+            var learners = db.Learners.Where(l => l.MajorID == mid).Include(m => m.Major).ToList();
+            return PartialView("PsdLearnerTable", learners);
+        }
+
+        [Route("Learner/LearnerFilter")]
+        [Route("PsdLearner/LearnerFilter")]
+        [Route("LearnerFilter")]
+        public IActionResult LearnerFilter(int? mid, string? keyword, int? pageIndex)
+        {
+            var learners = (IQueryable<PsdLearner>)db.Learners;
+            int page = (int)(pageIndex == null || pageIndex <= 0 ? 1 : pageIndex);
+            if (mid != null)
+            {
+                learners = learners.Where(l => l.MajorID == mid);
+                ViewBag.mid = mid;
+            }
+            if (keyword != null)
+            {
+                learners = learners.Where(l => l.FirstMidName.ToLower().Contains(keyword.ToLower()));
+                ViewBag.keyword = keyword;
+            }
+            int pageNum = (int)Math.Ceiling(learners.Count() / (float)pageSize);
+            ViewBag.pageNum = pageNum;
+            var result = learners.Skip(pageSize * (page - 1)).Take(pageSize).Include(m => m.Major).ToList();
+            return PartialView("PsdLearnerTable", result);
         }
 
         [HttpGet]
